@@ -142,6 +142,10 @@ class SoundEngine {
       } catch (e) {}
     });
     this.activeAudios = [];
+    if (this.synthLoopInterval) {
+      clearInterval(this.synthLoopInterval);
+      this.synthLoopInterval = null;
+    }
   }
 
   setMuted(muted) {
@@ -164,7 +168,7 @@ class SoundEngine {
     }
   }
 
-  play(soundKey) {
+  play(soundKey, loop = false) {
     if (state.isMuted) return;
     this.initAudioContext();
 
@@ -173,10 +177,13 @@ class SoundEngine {
       // Try playing file from assets/sounds/
       const audio = new Audio(src);
       audio.volume = 0.9;
+      audio.loop = loop;
       this.activeAudios.push(audio);
       audio.onended = () => {
-        const idx = this.activeAudios.indexOf(audio);
-        if (idx !== -1) this.activeAudios.splice(idx, 1);
+        if (!audio.loop) {
+          const idx = this.activeAudios.indexOf(audio);
+          if (idx !== -1) this.activeAudios.splice(idx, 1);
+        }
       };
 
       const playPromise = audio.play();
@@ -184,20 +191,28 @@ class SoundEngine {
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
           // File missing or blocked -> fallback to synthesized sound
-          this.playSynthesized(soundKey);
+          this.playSynthesized(soundKey, loop);
         });
         return;
       }
     }
 
     // Direct synth fallback
-    this.playSynthesized(soundKey);
+    this.playSynthesized(soundKey, loop);
   }
 
-  playSynthesized(soundKey) {
+  playSynthesized(soundKey, loop = false) {
     if (state.isMuted || !state.audioCtx) return;
     const ctx = state.audioCtx;
     const now = ctx.currentTime;
+
+    if (loop && soundKey === "happyCat") {
+      if (this.synthLoopInterval) clearInterval(this.synthLoopInterval);
+      this.synthLoopInterval = setInterval(() => {
+        if (!state.isRunning || state.isMuted) return;
+        this.playSynthesized("happyCat", false);
+      }, 1500);
+    }
 
     switch (soundKey) {
       case "suspense": {
@@ -937,8 +952,8 @@ function settleToFinalCelebration() {
   populateFinalWinnersGrid();
   el.finalComposition.classList.remove("hidden");
 
-  // Trigger sound Happy Cat song
-  sounds.play("happyCat");
+  // Trigger sound Happy Cat song on infinite loop!
+  sounds.play("happyCat", true);
 
   // Continuous celebratory confetti
   const confettiInterval = setInterval(() => {
