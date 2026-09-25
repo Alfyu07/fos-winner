@@ -66,7 +66,7 @@
         <div id="instant-badge" class="reveal-badge-glow">👑 PEMENANG TERPILIH 👑</div>
         <div id="instant-winner-name" class="instant-name-text">NAMA PEMENANG</div>
         <div id="instant-winner-branch" class="instant-branch-text">KCP CAKRA</div>
-        <div class="reveal-category-label">🏆 FOS BEST PERFORMER 🏆</div>
+        <div id="instant-reveal-category" class="reveal-category-label">🏆 FOS BEST PERFORMER 🏆</div>
       </div>
 
       <!-- Final Layout (Revealed all winners in glorious golden cards) -->
@@ -94,7 +94,7 @@
 
           <!-- Main Center Happy Cat & Bouncing Slogan -->
           <div class="happy-cat-center">
-            <h3 class="happy-slogan">HAPPY HAPPY HAPPY 🎉</h3>
+            <h3 id="happy-slogan" class="happy-slogan">HAPPY HAPPY HAPPY 🎉</h3>
             <img class="cat-gif-main" src="assets/happy-cat.gif" alt="Happy Happy Happy Cat">
           </div>
 
@@ -129,8 +129,9 @@
   <!-- Start Overlay for Browser Autoplay Interaction -->
   <div id="start-overlay" class="overlay-modal active">
     <div class="start-modal-box">
-      <div class="start-badge">🏆 PENGUMUMAN RESMI</div>
-      <h1 class="start-title">FOS BEST PERFORMER</h1>
+      <div id="start-badge" class="start-badge">🏆 PENGUMUMAN RESMI</div>
+      <h1 id="start-title" class="start-title">FOS BEST PERFORMER</h1>
+      <p id="start-subtitle" class="start-subtitle">Siapakah yang paling gacor dalam pengisian FOS?</p>
 
       <button id="btn-start-show" class="start-glow-btn">
         <span class="btn-play-icon">▶</span>
@@ -144,7 +145,7 @@
         <span>•</span>
         <span><b>M</b>: Suara</span>
         <span>•</span>
-        <span><b>S</b>: Edit Nama</span>
+        <span><b>S</b>: Edit Teks & Nama</span>
         <span>•</span>
         <span><b>R</b>: Reset</span>
       </div>
@@ -161,25 +162,36 @@
 
       <div class="settings-body">
         <label for="input-winners">
-          <strong>Daftar Nama Pemenang (1 baris per nama):</strong>
+          <strong>Daftar Nama Pemenang (1 baris per nama, format: NAMA - CABANG):</strong>
         </label>
-        <textarea id="input-winners" rows="4" placeholder="AHMAD FAUZI&#10;SITI NURHALIZA&#10;BUDI SANTOSO"></textarea>
+        <textarea id="input-winners" rows="4" placeholder="DITHA AYUDYA ERFIANTI - KCP CAKRA&#10;AZIZUDDIN MARNO - KC Gerung&#10;LALU WIBAWA PERMADI - KCP KERUAK"></textarea>
 
         <div class="settings-two-col">
           <div>
-            <label for="input-title"><strong>Judul Utama:</strong></label>
+            <label for="input-title"><strong>Judul Utama (Title):</strong></label>
             <input type="text" id="input-title" placeholder="FOS BEST PERFORMER">
           </div>
           <div>
-            <label for="input-subtitle"><strong>Sub-Judul Awal:</strong></label>
+            <label for="input-subtitle"><strong>Sub-Judul Awal / Pertanyaan:</strong></label>
             <input type="text" id="input-subtitle" placeholder="Siapakah yang paling gacor dalam pengisian FOS?">
           </div>
         </div>
 
-        <label for="input-category"><strong>Kategori / Keterangan Penghargaan:</strong></label>
-        <input type="text" id="input-category" placeholder="TERBAIK DALAM PENGISIAN SISTEM FOS">
+        <div class="settings-two-col">
+          <div>
+            <label for="input-badge"><strong>Label Badge Awal:</strong></label>
+            <input type="text" id="input-badge" placeholder="🏆 PENGUMUMAN RESMI">
+          </div>
+          <div>
+            <label for="input-category"><strong>Kategori Penghargaan (Kartu):</strong></label>
+            <input type="text" id="input-category" placeholder="TERBAIK DALAM PENGISIAN SISTEM FOS">
+          </div>
+        </div>
 
-        <label for="input-memes"><strong>Meme Captions (Pisahkan dengan baris baru):</strong></label>
+        <label for="input-slogan"><strong>Slogan Kucing Happy:</strong></label>
+        <input type="text" id="input-slogan" placeholder="HAPPY HAPPY HAPPY 🎉">
+
+        <label for="input-memes"><strong>Meme Popups (Pisahkan dengan baris baru):</strong></label>
         <textarea id="input-memes" rows="2" placeholder="FOS INPUT GO BRRRRR 🚀&#10;ADMIN PALING GACOR 🔥"></textarea>
       </div>
 

@@ -7,14 +7,16 @@
 
 // Global Configuration (Easily customized or edited live in-browser via 'S' key)
 const DEFAULT_CONFIG = {
+  badge: "🏆 PENGUMUMAN RESMI",
+  title: "FOS BEST PERFORMER",
+  subtitle: "Siapakah yang paling gacor dalam pengisian FOS?",
+  awardCategory: "TERBAIK DALAM PENGISIAN SISTEM FOS",
+  slogan: "HAPPY HAPPY HAPPY 🎉",
   winners: [
     "DITHA AYUDYA ERFIANTI - KCP CAKRA",
     "AZIZUDDIN MARNO - KC Gerung",
     "LALU WIBAWA PERMADI - KCP KERUAK"
   ],
-  title: "FOS BEST PERFORMER",
-  subtitle: "Siapakah yang paling gacor dalam pengisian FOS?",
-  awardCategory: "TERBAIK DALAM PENGISIAN SISTEM FOS",
   memeCaptions: [
     "FOS INPUT GO BRRRRR 🚀",
     "ADMIN PALING GACOR 🔥",
@@ -50,7 +52,7 @@ try {
       parsed.winners = [...DEFAULT_CONFIG.winners];
     }
     localStorage.setItem("fos_award_config", JSON.stringify(parsed));
-    CONFIG = { ...CONFIG, ...parsed, audio: { ...DEFAULT_CONFIG.audio, ...(parsed.audio || {}) } };
+    CONFIG = { ...DEFAULT_CONFIG, ...parsed, audio: { ...DEFAULT_CONFIG.audio, ...(parsed.audio || {}) } };
   }
 } catch (e) {
   console.warn("Could not load saved config:", e);
@@ -95,17 +97,22 @@ const el = {
   instantBadge: document.getElementById("instant-badge"),
   instantWinnerName: document.getElementById("instant-winner-name"),
   instantWinnerBranch: document.getElementById("instant-winner-branch"),
+  instantRevealCategory: document.getElementById("instant-reveal-category"),
 
   finalComposition: document.getElementById("final-composition"),
   finalMainTitle: document.getElementById("final-main-title"),
   finalSubHeading: document.getElementById("final-sub-heading"),
   winnersGrid: document.getElementById("winners-grid"),
+  happySlogan: document.getElementById("happy-slogan"),
 
   memeCaptionBox: document.getElementById("meme-caption-box"),
   memeCaptionText: document.getElementById("meme-caption-text"),
   chaosEmojiLayer: document.getElementById("chaos-emoji-layer"),
 
   startOverlay: document.getElementById("start-overlay"),
+  startBadge: document.getElementById("start-badge"),
+  startTitle: document.getElementById("start-title"),
+  startSubtitle: document.getElementById("start-subtitle"),
   btnStartShow: document.getElementById("btn-start-show"),
 
   btnFullscreen: document.getElementById("btn-fullscreen"),
@@ -118,7 +125,9 @@ const el = {
   inputWinners: document.getElementById("input-winners"),
   inputTitle: document.getElementById("input-title"),
   inputSubtitle: document.getElementById("input-subtitle"),
+  inputBadge: document.getElementById("input-badge"),
   inputCategory: document.getElementById("input-category"),
+  inputSlogan: document.getElementById("input-slogan"),
   inputMemes: document.getElementById("input-memes"),
   btnSaveClose: document.getElementById("btn-save-close"),
   btnSaveRestart: document.getElementById("btn-save-restart"),
@@ -760,6 +769,32 @@ function populateFinalWinnersGrid() {
   });
 }
 
+function updateAllDynamicTexts() {
+  const currentTitle = CONFIG.title || DEFAULT_CONFIG.title;
+  const currentSubtitle = CONFIG.subtitle || DEFAULT_CONFIG.subtitle;
+  const currentBadge = CONFIG.badge || DEFAULT_CONFIG.badge;
+  const currentCategory = CONFIG.awardCategory || DEFAULT_CONFIG.awardCategory;
+  const currentSlogan = CONFIG.slogan || DEFAULT_CONFIG.slogan;
+
+  // Browser tab title
+  document.title = `${currentTitle} - Award Announcement`;
+
+  // Start Screen Overlay (Halaman Awal)
+  if (el.startBadge) el.startBadge.textContent = currentBadge;
+  if (el.startTitle) el.startTitle.textContent = currentTitle;
+  if (el.startSubtitle) el.startSubtitle.textContent = currentSubtitle;
+
+  // Scene 1: Opening Suspense Card (Transisi Pertama)
+  if (el.openingTitle) el.openingTitle.textContent = currentTitle;
+  if (el.openingSubtitle) el.openingSubtitle.textContent = currentSubtitle;
+
+  // Scene 2: Reveal & Final Composition
+  if (el.instantRevealCategory) el.instantRevealCategory.textContent = `🏆 ${currentTitle} 🏆`;
+  if (el.finalMainTitle) el.finalMainTitle.textContent = currentTitle;
+  if (el.finalSubHeading) el.finalSubHeading.textContent = currentCategory;
+  if (el.happySlogan) el.happySlogan.textContent = currentSlogan;
+}
+
 function startShow() {
   sounds.stopAll();
   clearAllTimeouts();
@@ -787,11 +822,8 @@ function startShow() {
   el.memeCaptionBox.classList.remove("visible");
   el.chaosEmojiLayer.innerHTML = "";
 
-  // Update dynamic texts
-  el.openingTitle.textContent = CONFIG.title;
-  el.openingSubtitle.textContent = CONFIG.subtitle;
-  el.finalMainTitle.textContent = CONFIG.title;
-  el.finalSubHeading.textContent = CONFIG.awardCategory;
+  // Update dynamic texts across all screens
+  updateAllDynamicTexts();
 
   // 1. OPENING: 0s - 3s
   sounds.play("suspense");
@@ -1067,7 +1099,9 @@ function openSettingsModal() {
   el.inputWinners.value = (CONFIG.winners || []).join("\n");
   el.inputTitle.value = CONFIG.title || "";
   el.inputSubtitle.value = CONFIG.subtitle || "";
+  if (el.inputBadge) el.inputBadge.value = CONFIG.badge || "";
   el.inputCategory.value = CONFIG.awardCategory || "";
+  if (el.inputSlogan) el.inputSlogan.value = CONFIG.slogan || "";
   el.inputMemes.value = (CONFIG.memeCaptions || []).join("\n");
 
   el.settingsModal.classList.remove("hidden");
@@ -1093,7 +1127,13 @@ function saveSettings(restartAfterSave = false) {
   CONFIG.winners = winnerLines.length > 0 ? winnerLines : ["NAMA PEMENANG"];
   CONFIG.title = el.inputTitle.value.trim() || DEFAULT_CONFIG.title;
   CONFIG.subtitle = el.inputSubtitle.value.trim() || DEFAULT_CONFIG.subtitle;
+  if (el.inputBadge) {
+    CONFIG.badge = el.inputBadge.value.trim() || DEFAULT_CONFIG.badge;
+  }
   CONFIG.awardCategory = el.inputCategory.value.trim() || DEFAULT_CONFIG.awardCategory;
+  if (el.inputSlogan) {
+    CONFIG.slogan = el.inputSlogan.value.trim() || DEFAULT_CONFIG.slogan;
+  }
   if (memeLines.length > 0) CONFIG.memeCaptions = memeLines;
 
   // Persist to localStorage
@@ -1102,6 +1142,10 @@ function saveSettings(restartAfterSave = false) {
   } catch (e) {
     console.warn("Failed to save to localStorage:", e);
   }
+
+  // Update dynamic texts & cards immediately
+  updateAllDynamicTexts();
+  populateFinalWinnersGrid();
 
   closeSettingsModal();
 
@@ -1115,6 +1159,8 @@ function resetSettingsToDefault() {
   try {
     localStorage.removeItem("fos_award_config");
   } catch (e) {}
+  updateAllDynamicTexts();
+  populateFinalWinnersGrid();
   openSettingsModal();
 }
 
@@ -1196,8 +1242,7 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-// Initialize display texts
-el.openingTitle.textContent = CONFIG.title;
-el.openingSubtitle.textContent = CONFIG.subtitle;
-el.finalMainTitle.textContent = CONFIG.title;
-el.finalSubHeading.textContent = CONFIG.awardCategory;
+// Initialize display texts & winner cards
+updateAllDynamicTexts();
+populateFinalWinnersGrid();
+
