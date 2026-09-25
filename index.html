@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🏆 FOS Best Performer - Award Announcement</title>
+
+  <!-- Google Fonts for Ultra-Bold Award Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&family=Outfit:wght@400;600;800;900&display=swap"
+    rel="stylesheet">
+
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Ambient & Fireworks Canvas Backgrounds -->
+  <canvas id="ambient-canvas"></canvas>
+  <canvas id="fireworks-canvas"></canvas>
+
+  <!-- Flash & Explosion Overlays -->
+  <div id="flash-overlay"></div>
+  <div id="radial-shockwave"></div>
+  <div id="explosion-overlay">
+    <img id="explosion-gif" src="assets/explosion.gif" alt="Explosion">
+  </div>
+
+  <!-- Stage Container (Animated via CSS for Screen Shake) -->
+  <div id="stage">
+
+    <!-- SCENE 1: SUSPENSE & COUNTDOWN -->
+    <div id="scene-suspense" class="scene active">
+
+      <!-- Opening Title -->
+      <div id="opening-card" class="card-suspense">
+        <div class="trophy-badge">🏆</div>
+        <h1 id="opening-title" class="cinematic-title">FOS BEST PERFORMER</h1>
+        <div class="glow-divider"></div>
+        <p id="opening-subtitle" class="cinematic-subtitle">Siapakah yang paling gacor dalam pengisian FOS?</p>
+      </div>
+
+      <!-- Giant Countdown Numbers -->
+      <div id="countdown-card" class="card-suspense hidden">
+        <div id="countdown-number" class="countdown-digits">3</div>
+        <div id="countdown-pulse-ring"></div>
+      </div>
+
+      <!-- Teaser "AND THE WINNER IS..." -->
+      <div id="teaser-card" class="card-suspense hidden">
+        <h2 id="teaser-text" class="teaser-typography">A N D &nbsp; T H E &nbsp; W I N N E R &nbsp; I S . . .</h2>
+      </div>
+
+    </div>
+
+    <!-- SCENE 2: REVEAL & CHAOS CELEBRATION -->
+    <div id="scene-celebration" class="scene hidden">
+
+      <!-- Single Winner Instant Reveal Pop (Shown during sequential reveal) -->
+      <div id="instant-reveal-container" class="hidden">
+        <div id="instant-badge" class="reveal-badge-glow">👑 PEMENANG TERPILIH 👑</div>
+        <div id="instant-winner-name" class="instant-name-text">NAMA PEMENANG</div>
+        <div id="instant-winner-branch" class="instant-branch-text">KCP CAKRA</div>
+        <div class="reveal-category-label">🏆 FOS BEST PERFORMER 🏆</div>
+      </div>
+
+      <!-- Final Layout (Revealed all winners in glorious golden cards) -->
+      <div id="final-composition" class="final-container hidden">
+
+        <!-- Header Banner with Dropping Crown -->
+        <div class="final-header">
+          <div id="floating-crown" class="crown-icon">👑</div>
+          <div class="congrats-tag">CONGRATULATIONS!</div>
+          <h2 id="final-main-title" class="final-award-title">FOS BEST PERFORMER</h2>
+          <p id="final-sub-heading" class="final-award-sub">TERBAIK DALAM PENGISIAN SISTEM FOS</p>
+        </div>
+
+        <!-- Winners Grid (Auto adapts to 1, 2, 3 or more winners) -->
+        <div id="winners-grid" class="winners-grid-layout">
+          <!-- Dynamically populated via JavaScript -->
+        </div>
+
+        <!-- Happy Cat Meme Section -->
+        <div id="happy-cat-stage" class="happy-cat-wrapper">
+          <!-- Left Small Cat -->
+          <div class="happy-cat-side left-cat">
+            <img class="cat-gif-img" src="assets/happy-cat.gif" alt="Happy Cat Left">
+          </div>
+
+          <!-- Main Center Happy Cat & Bouncing Slogan -->
+          <div class="happy-cat-center">
+            <h3 class="happy-slogan">HAPPY HAPPY HAPPY 🎉</h3>
+            <img class="cat-gif-main" src="assets/happy-cat.gif" alt="Happy Happy Happy Cat">
+          </div>
+
+          <!-- Right Small Cat -->
+          <div class="happy-cat-side right-cat">
+            <img class="cat-gif-img" src="assets/happy-cat.gif" alt="Happy Cat Right">
+          </div>
+        </div>
+
+        <!-- Chaos Flying Meme Captions -->
+        <div id="meme-caption-box" class="meme-caption-popup">
+          <span id="meme-caption-text">FOS INPUT GO BRRRRR 🚀</span>
+        </div>
+
+      </div>
+
+      <!-- Chaos Mode Flying Emojis Layer -->
+      <div id="chaos-emoji-layer"></div>
+
+    </div>
+
+  </div>
+
+  <!-- Stealth Host / Presenter Controls (Top Right, auto-fade) -->
+  <div id="host-controls" class="host-bar">
+    <button id="btn-fullscreen" class="host-btn" title="Toggle Fullscreen (F)">⛶</button>
+    <button id="btn-audio-toggle" class="host-btn" title="Toggle Audio (M)">🔊</button>
+    <button id="btn-settings" class="host-btn" title="Pengaturan Nama & Teks (S)">⚙️</button>
+    <button id="btn-restart" class="host-btn" title="Ulangi Animasi (R)">↻</button>
+  </div>
+
+  <!-- Start Overlay for Browser Autoplay Interaction -->
+  <div id="start-overlay" class="overlay-modal active">
+    <div class="start-modal-box">
+      <div class="start-badge">🏆 PENGUMUMAN RESMI</div>
+      <h1 class="start-title">FOS BEST PERFORMER</h1>
+
+      <button id="btn-start-show" class="start-glow-btn">
+        <span class="btn-play-icon">▶</span>
+        <span class="btn-text">MULAI PENGUMUMAN</span>
+      </button>
+
+      <div class="start-shortcuts-hint">
+        <span>Tekan <b>SPACE</b>: Mulai/Ulangi</span>
+        <span>•</span>
+        <span><b>F</b>: Layar Penuh</span>
+        <span>•</span>
+        <span><b>M</b>: Suara</span>
+        <span>•</span>
+        <span><b>S</b>: Edit Nama</span>
+        <span>•</span>
+        <span><b>R</b>: Reset</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Edit Settings Modal (Keyboard 'S' or Gear button) -->
+  <div id="settings-modal" class="overlay-modal hidden">
+    <div class="settings-modal-box">
+      <div class="settings-header">
+        <h3>⚙️ Pengaturan Pengumuman (Quick Edit)</h3>
+        <button id="btn-close-settings" class="close-btn">&times;</button>
+      </div>
+
+      <div class="settings-body">
+        <label for="input-winners">
+          <strong>Daftar Nama Pemenang (1 baris per nama):</strong>
+        </label>
+        <textarea id="input-winners" rows="4" placeholder="AHMAD FAUZI&#10;SITI NURHALIZA&#10;BUDI SANTOSO"></textarea>
+
+        <div class="settings-two-col">
+          <div>
+            <label for="input-title"><strong>Judul Utama:</strong></label>
+            <input type="text" id="input-title" placeholder="FOS BEST PERFORMER">
+          </div>
+          <div>
+            <label for="input-subtitle"><strong>Sub-Judul Awal:</strong></label>
+            <input type="text" id="input-subtitle" placeholder="Siapakah yang paling gacor dalam pengisian FOS?">
+          </div>
+        </div>
+
+        <label for="input-category"><strong>Kategori / Keterangan Penghargaan:</strong></label>
+        <input type="text" id="input-category" placeholder="TERBAIK DALAM PENGISIAN SISTEM FOS">
+
+        <label for="input-memes"><strong>Meme Captions (Pisahkan dengan baris baru):</strong></label>
+        <textarea id="input-memes" rows="2" placeholder="FOS INPUT GO BRRRRR 🚀&#10;ADMIN PALING GACOR 🔥"></textarea>
+      </div>
+
+      <div class="settings-footer">
+        <button id="btn-reset-defaults" class="secondary-btn">Reset Default</button>
+        <div class="footer-actions">
+          <button id="btn-save-close" class="secondary-btn">Simpan</button>
+          <button id="btn-save-restart" class="primary-btn">Simpan & Mulai Show</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
