@@ -424,6 +424,28 @@ html, body {
   color: var(--gold);
   text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
   margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.reveal-badge-glow.badge-rank-1 {
+  color: #FFF275;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.95), 0 0 40px rgba(255, 107, 0, 0.85);
+  animation: badgePulseGold 1.5s ease-in-out infinite alternate;
+}
+
+.reveal-badge-glow.badge-rank-2 {
+  color: #F1F5F9;
+  text-shadow: 0 0 20px rgba(226, 232, 240, 0.9), 0 0 35px rgba(0, 229, 255, 0.85);
+}
+
+.reveal-badge-glow.badge-rank-3 {
+  color: #FED7AA;
+  text-shadow: 0 0 20px rgba(251, 146, 60, 0.9), 0 0 35px rgba(217, 119, 6, 0.85);
+}
+
+@keyframes badgePulseGold {
+  0% { transform: scale(1); filter: brightness(1); }
+  100% { transform: scale(1.04); filter: brightness(1.2); }
 }
 
 .instant-name-text {
@@ -623,6 +645,55 @@ html, body {
     border-color: rgba(255, 215, 0, 0.95);
     box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), 0 0 45px rgba(255, 215, 0, 0.55);
   }
+}
+
+.winner-gold-card.rank-1 {
+  border: 2.5px solid rgba(255, 215, 0, 0.95);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.9), 0 0 50px rgba(255, 215, 0, 0.6);
+  z-index: 5;
+}
+
+/* Rank Pills on Final Cards */
+.card-rank-pill {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: clamp(0.9rem, 1.4vw, 1.25rem);
+  letter-spacing: 0.12em;
+  padding: 0.3rem 1.2rem;
+  border-radius: 9999px;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+}
+
+.pill-rank-1 {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(255, 107, 0, 0.4));
+  border: 2px solid var(--gold-light);
+  color: #FFFFFF;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.9);
+}
+
+.pill-rank-2 {
+  background: linear-gradient(135deg, rgba(226, 232, 240, 0.3), rgba(0, 229, 255, 0.3));
+  border: 2px solid #CBD5E1;
+  color: #F8FAFC;
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.6);
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.9);
+}
+
+.pill-rank-3 {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.3), rgba(251, 146, 60, 0.3));
+  border: 2px solid #F97316;
+  color: #FED7AA;
+  box-shadow: 0 0 18px rgba(249, 115, 22, 0.6);
+  text-shadow: 0 0 10px rgba(249, 115, 22, 0.9);
+}
+
+.pill-rank-other {
+  background: rgba(148, 163, 184, 0.25);
+  border: 1.5px solid #94A3B8;
+  color: #E2E8F0;
 }
 
 .card-crown-mini {

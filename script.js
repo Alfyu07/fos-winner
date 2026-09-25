@@ -25,7 +25,7 @@ const DEFAULT_CONFIG = {
     "DATA VALID NO DEBAT 📋"
   ],
   autoChaosDelayMs: 2000,
-  revealIntervalMs: 1400,
+  revealIntervalMs: 3600,
   audio: {
     suspense: "assets/sounds/suspense.mp3",
     countdownHit: "assets/sounds/countdown-hit.mp3",
@@ -50,6 +50,10 @@ try {
     // If the saved data was from the old template, overwrite with the real winners
     if (parsed.winners && (parsed.winners.includes("AHMAD FAUZI") || parsed.winners.includes("NAMA PEMENANG 1"))) {
       parsed.winners = [...DEFAULT_CONFIG.winners];
+    }
+    // Upgrade reveal speed if previously set to too-fast old default
+    if (parsed.revealIntervalMs && parsed.revealIntervalMs < 3000) {
+      parsed.revealIntervalMs = DEFAULT_CONFIG.revealIntervalMs;
     }
     localStorage.setItem("fos_award_config", JSON.stringify(parsed));
     CONFIG = { ...DEFAULT_CONFIG, ...parsed, audio: { ...DEFAULT_CONFIG.audio, ...(parsed.audio || {}) } };
@@ -755,12 +759,33 @@ function populateFinalWinnersGrid() {
   const isSingle = winnerList.length === 1;
 
   winnerList.forEach((rawWinner, idx) => {
+    const rank = idx + 1;
     const { name, branch } = parseWinnerInfo(rawWinner);
     const card = document.createElement("div");
-    card.className = `winner-gold-card ${isSingle ? "single-winner" : ""}`;
+    card.className = `winner-gold-card rank-${rank} ${isSingle ? "single-winner" : ""}`;
     card.style.setProperty("--card-idx", idx);
+
+    let rankPill = "";
+    let crownIcon = "👑";
+    if (!isSingle) {
+      if (rank === 1) {
+        rankPill = `<div class="card-rank-pill pill-rank-1">👑 JUARA 1</div>`;
+        crownIcon = "👑";
+      } else if (rank === 2) {
+        rankPill = `<div class="card-rank-pill pill-rank-2">🥈 JUARA 2</div>`;
+        crownIcon = "🥈";
+      } else if (rank === 3) {
+        rankPill = `<div class="card-rank-pill pill-rank-3">🥉 JUARA 3</div>`;
+        crownIcon = "🥉";
+      } else {
+        rankPill = `<div class="card-rank-pill pill-rank-other">🎖️ JUARA ${rank}</div>`;
+        crownIcon = "🎖️";
+      }
+    }
+
     card.innerHTML = `
-      <div class="card-crown-mini">👑</div>
+      ${rankPill}
+      <div class="card-crown-mini">${crownIcon}</div>
       <div class="card-winner-name">${name}</div>
       ${branch ? `<div class="card-winner-branch">🏢 ${branch}</div>` : ""}
       <div class="card-winner-title">🏆 ${CONFIG.awardCategory || "FOS BEST PERFORMER"}</div>
@@ -912,20 +937,60 @@ function executeWinnerReveal() {
   // 1. Initial Grand BOOM!
   triggerBigBoom();
 
-  // 2. Reveal winners sequentially
-  let currentDelay = 150;
-  winnerList.forEach((winnerName, index) => {
+  // 2. Prepare reveal items: start from lowest rank (e.g. Juara 3) up to Juara 1
+  // Baris 1 = Juara 1, Baris 2 = Juara 2, Baris 3 = Juara 3
+  const revealItems = [];
+  if (winnerList.length === 1) {
+    revealItems.push({ rawName: winnerList[0], rank: 1, isGrand: true });
+  } else {
+    for (let i = winnerList.length - 1; i >= 0; i--) {
+      revealItems.push({
+        rawName: winnerList[i],
+        rank: i + 1,
+        isGrand: (i === 0)
+      });
+    }
+  }
+
+  // 3. Pacing: slower, dramatic, and suspenseful
+  const baseDuration = (CONFIG.revealIntervalMs && CONFIG.revealIntervalMs >= 2500)
+    ? CONFIG.revealIntervalMs
+    : 3600;
+  const grandDuration = Math.round(baseDuration * 1.25); // Juara 1 gets longer celebration
+  const fadeOutTime = 320;
+  const tensionPause = 750;
+
+  let currentDelay = 650; // allow initial big explosion smoke to clear
+
+  revealItems.forEach((item, index) => {
+    const isLast = (index === revealItems.length - 1);
+    const duration = item.isGrand ? grandDuration : baseDuration;
+
+    // Trigger reveal of this winner
     scheduleTimeout(() => {
-      showInstantWinnerPop(winnerName, index + 1);
+      showInstantWinnerPop(item.rawName, item.rank, item.isGrand);
     }, currentDelay);
 
-    currentDelay += CONFIG.revealIntervalMs || 1400;
+    if (!isLast) {
+      // Fade out & play suspense riser for next higher rank
+      scheduleTimeout(() => {
+        el.instantRevealContainer.classList.add("fade-out");
+        sounds.play("riser");
+      }, currentDelay + duration);
+      currentDelay += duration + fadeOutTime + tensionPause;
+    } else {
+      // Grand champion: fade out after glorious showcase
+      scheduleTimeout(() => {
+        el.instantRevealContainer.classList.add("fade-out");
+      }, currentDelay + duration);
+      currentDelay += duration + fadeOutTime + 350;
+    }
   });
 
-  // 3. Transition to Final Composite Screen after sequential pops
+  // 4. Transition to Final Composite Screen after all reveals completed
   scheduleTimeout(() => {
     settleToFinalCelebration();
-  }, currentDelay + 250);
+  }, currentDelay);
 }
 
 function triggerBigBoom() {
@@ -942,19 +1007,47 @@ function triggerBigBoom() {
   state.fireworksActive = true;
 }
 
-function showInstantWinnerPop(rawName, rank) {
+function showInstantWinnerPop(rawName, rank, isGrand = false) {
   // Retrigger explosive impact on each winner name
-  triggerShockwave();
-  screenShake("intense");
-  sounds.play("explosion");
-  launchConfetti(false);
+  if (isGrand) {
+    triggerWhiteFlash(120);
+    triggerShockwave();
+    screenShake("intense");
+    sounds.play("explosion");
+    sounds.play("cheering");
+    sounds.play("clapping");
+    launchConfetti(true);
+  } else {
+    triggerShockwave();
+    screenShake("intense");
+    sounds.play("explosion");
+    sounds.play("cheering");
+    sounds.play("clapping");
+    launchConfetti(false);
+  }
 
   const { name, branch } = parseWinnerInfo(rawName);
 
   if (el.instantBadge) {
-    el.instantBadge.textContent = CONFIG.winners && CONFIG.winners.length > 1
-      ? `👑 PEMENANG ${rank} 👑`
-      : "👑 PEMENANG TERPILIH 👑";
+    let badgeText = "👑 PEMENANG TERPILIH 👑";
+    let badgeClass = "badge-rank-1";
+    if (CONFIG.winners && CONFIG.winners.length > 1) {
+      if (rank === 1) {
+        badgeText = "👑 JUARA 1 (GRAND WINNER) 👑";
+        badgeClass = "badge-rank-1";
+      } else if (rank === 2) {
+        badgeText = "🥈 JUARA 2 🥈";
+        badgeClass = "badge-rank-2";
+      } else if (rank === 3) {
+        badgeText = "🥉 JUARA 3 🥉";
+        badgeClass = "badge-rank-3";
+      } else {
+        badgeText = `🎖️ JUARA ${rank} 🎖️`;
+        badgeClass = `badge-rank-${rank}`;
+      }
+    }
+    el.instantBadge.textContent = badgeText;
+    el.instantBadge.className = `reveal-badge-glow ${badgeClass}`;
   }
 
   el.instantWinnerName.textContent = name;
