@@ -6,4 +6,4 @@ services:
     container_name: fos-award-show
     restart: unless-stopped
     ports:
-      - "80:80"       # Ubah ke "8080:80" jika port 80 sudah dipakai aplikasi lain di VPS
+      - "8088:80"   # Menggunakan port 8088 di VPS
